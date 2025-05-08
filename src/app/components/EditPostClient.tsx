@@ -5,10 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "@/lib/axios";
 import Header from "./Header";
 
-export default function EditPostClient() {
+export default async function EditPostClient({ id }: { id: string }) {
   const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
+
   const [post, setPost] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
