@@ -7,11 +7,14 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret";
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { params } = context;
-    const { id } = params;
+    const { id } = await params;
     const token = req.headers.get("authorization")?.split(" ")[1];
 
     if (!token) {

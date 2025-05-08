@@ -5,9 +5,15 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 // const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret";
 
-export async function PUT(req: NextRequest, context: any) {
+export async function PUT(
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
   try {
-    const { params } = await context;
     const { id } = await params;
     const token = req.headers.get("authorization")?.split(" ")[1];
 
