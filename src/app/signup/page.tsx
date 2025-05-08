@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import axios from "@/lib/axios";
 import toast from "react-hot-toast";
 
 export default function Signup() {
@@ -24,7 +24,6 @@ export default function Signup() {
 
     try {
       const res = await axios.post("/signup", formData);
-      // setMessage(res.data.message);
       toast.success(res.data.message);
       router.push("/login");
     } catch (err: any) {

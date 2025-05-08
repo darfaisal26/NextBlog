@@ -9,5 +9,5 @@ export default function ClientDate({ createdAt }: { createdAt: string }) {
     setDate(new Date(createdAt).toLocaleString());
   }, [createdAt]);
 
-  return <p className="text-xs text-gray-900 mb-4">Created at: {date}</p>;
+  return <p className="text-sm text-gray-900 mb-4">Created at: {date}</p>;
 }

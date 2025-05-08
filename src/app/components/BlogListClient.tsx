@@ -5,6 +5,7 @@ import ClientDate from "../components/ClientDate";
 import axios from "@/lib/axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { deletePost } from "@/lib/api";
 
 interface BlogListClientProps {
   posts: any[];
@@ -22,11 +23,7 @@ export default function BlogListClient({
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this post?")) {
       try {
-        const res = await axios.delete(`/blogs/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await deletePost(id, token);
         if (res.status === 200) {
           toast.success("Post deleted successfully.");
           setPosts(posts.filter((post) => post.id !== id));

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
+import axios from "@/lib/axios";
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });

@@ -8,6 +8,7 @@ import axios from "@/lib/axios";
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const isAdmin = role === "ADMIN";
 
   useEffect(() => {
     const token = localStorage.getItem("token") || Cookies.get("token");
@@ -30,15 +31,12 @@ export default function Header() {
     };
   }, []);
 
-  const isAdmin = role === "ADMIN";
-
   const handleLogout = async () => {
     try {
       await axios.get("/logout");
       localStorage.clear();
       setIsLoggedIn(false);
       setRole(null);
-
       window.location.href = "/";
     } catch (error) {
       console.error("Logout failed", error);

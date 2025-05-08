@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
 import Header from "./Header";
+import toast from "react-hot-toast";
+import { updatePost } from "@/lib/api";
 
 interface PostData {
   title: string;
@@ -38,18 +40,21 @@ export default function EditPostClient({
       setLoading(false);
       return;
     }
-
+    if (!post.title || !post.content) {
+      setError("Title and content are required.");
+      setLoading(false);
+      return;
+    }
     try {
-      await axios.put(`/blogs/${id}`, post, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert("Post updated successfully.");
-      router.push("/blogs");
+      const res = await updatePost(id, post, token);
+
+      if (res.status === 200) {
+        toast.success("Post updated successfully.");
+        router.push("/blogs");
+      }
     } catch (error) {
       console.error("Error updating post:", error);
-      alert("Failed to update post.");
+      toast.error("Failed to update post.");
     } finally {
       setLoading(false);
     }

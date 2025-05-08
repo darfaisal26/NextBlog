@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
+import { createBlogPost } from "@/lib/api";
 
 const PostForm = () => {
   const [title, setTitle] = useState("");
@@ -52,16 +53,7 @@ const PostForm = () => {
         return;
       }
 
-      const response = await axios.post(
-        "/createblog",
-        { title, content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await createBlogPost(title, content, token);
 
       if (response.status === 201) {
         router.push("/blogs");
