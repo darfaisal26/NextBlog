@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import { FormSchema } from "@/lib/validation/formSchema";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs'; // instead of 'bcrypt'
+
 
 
 
