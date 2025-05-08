@@ -54,7 +54,6 @@ const PostForm = () => {
       }
 
       const response = await createBlogPost(title, content, token);
-
       if (response.status === 201) {
         router.push("/blogs");
       }
