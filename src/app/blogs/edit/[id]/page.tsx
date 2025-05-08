@@ -1,8 +1,12 @@
-import { getPostData } from "@/lib/api";
 import EditPostClient from "@/app/components/EditPostClient";
+import { getPostData } from "@/lib/api";
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
   let postData;
   try {
@@ -12,6 +16,5 @@ export default async function Page({ params }: { params: { id: string } }) {
     postData = { title: "", content: "" };
   }
 
-  // Return the client component and pass the data as props
   return <EditPostClient id={id} initialPostData={postData} />;
 }

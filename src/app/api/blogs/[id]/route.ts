@@ -9,10 +9,10 @@ export async function GET(
   {
     params,
   }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
   }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const post = await prisma.post.findUnique({
@@ -38,11 +38,11 @@ export async function DELETE(
   {
     params,
   }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
   }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const token = req.headers.get("authorization")?.split(" ")[1];
 
     if (!token) {
@@ -95,19 +95,16 @@ export async function PUT(
   {
     params,
   }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
   }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const token = req.headers.get("authorization")?.split(" ")[1];
 
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    // const userId = decoded.userId;
 
     const post = await prisma.post.findUnique({
       where: { id: Number(id) },

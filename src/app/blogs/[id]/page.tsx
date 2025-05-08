@@ -4,12 +4,9 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 10;
 
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const res = await axios.get(`/blogs/${params.id}`);
+export default async function BlogDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const res = await axios.get(`/blogs/${id}`);
   const posts = res.data;
 
   if (!posts) {
