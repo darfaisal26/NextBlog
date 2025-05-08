@@ -22,7 +22,7 @@ export default function BlogListClient({
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this post?")) {
       try {
-        const res = await axios.delete(`/blogs/delete/${id}`, {
+        const res = await axios.delete(`/blogs/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

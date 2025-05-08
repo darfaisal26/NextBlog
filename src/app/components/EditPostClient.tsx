@@ -1,47 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
 import Header from "./Header";
 
-export default async function EditPostClient({ id }: { id: string }) {
-  const router = useRouter();
+interface PostData {
+  title: string;
+  content: string;
+}
 
-  const [post, setPost] = useState({ title: "", content: "" });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const token = localStorage.getItem("token");
+interface EditPostClientProps {
+  id: string;
+  initialPostData: PostData;
+}
+
+export default function EditPostClient({
+  id,
+  initialPostData,
+}: EditPostClientProps) {
+  const router = useRouter();
+  const [post, setPost] = useState<PostData>(initialPostData);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!id) {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    if (!token) {
+      setError("No token found.");
       setLoading(false);
       return;
     }
 
-    const fetchPost = async () => {
-      try {
-        console.log("Fetching post with ID:", id);
-        const response = await axios.get(`/blogs/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data, "response data");
-        setPost(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to load post.");
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [id, token]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     try {
-      await axios.put(`/blogs/edit/${id}`, post, {
+      await axios.put(`/blogs/${id}`, post, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,15 +50,11 @@ export default async function EditPostClient({ id }: { id: string }) {
     } catch (error) {
       console.error("Error updating post:", error);
       alert("Failed to update post.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading)
-    return (
-      <p className="flex justify-center  text-black min-h-screen items-center ">
-        Loading...
-      </p>
-    );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
@@ -67,9 +62,9 @@ export default async function EditPostClient({ id }: { id: string }) {
       <div className="relative z-10">
         <Header />
       </div>
-      <div className=" py-10 px-4 ">
+      <div className="py-10 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="p-8 rounded-2xl relative z-20 border  ">
+          <div className="p-8 rounded-2xl relative z-20 border">
             <h1 className="text-3xl font-semibold text-white mb-6 text-center sm:text-left">
               Edit Post
             </h1>
