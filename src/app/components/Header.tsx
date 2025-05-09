@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import axios from "@/lib/axios";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  BookOpen,
+  FilePlus,
+  LogOut,
+  LogIn,
+  UserPlus,
+} from "lucide-react";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,10 +37,7 @@ export default function Header() {
     };
 
     window.addEventListener("storage", checkAuthState);
-
-    return () => {
-      window.removeEventListener("storage", checkAuthState);
-    };
+    return () => window.removeEventListener("storage", checkAuthState);
   }, []);
 
   const handleLogout = async () => {
@@ -47,14 +52,34 @@ export default function Header() {
     }
   };
 
+  const MenuItem = ({
+    href,
+    label,
+    icon: Icon,
+    onClick,
+  }: {
+    href?: string;
+    label: string;
+    icon: React.ElementType;
+    onClick?: () => void;
+  }) => (
+    <div className="flex items-center gap-2 text-white hover:text-blue-400 transition">
+      {Icon && <Icon size={18} />}
+      {href ? (
+        <Link href={href}>{label}</Link>
+      ) : (
+        <button onClick={onClick} className="text-left">
+          {label}
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <header className="bg-gray-900 text-white shadow-md">
       <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">
-          <Link
-            href="/"
-            className="hover:text-gray-300 transition duration-200"
-          >
+          <Link href="/" className="hover:text-gray-300 transition">
             Next Blog
           </Link>
         </h1>
@@ -64,82 +89,39 @@ export default function Header() {
         </button>
 
         {/* Desktop Nav */}
-        <nav className="hidden sm:flex items-center space-x-4">
+        <nav className="hidden sm:flex items-center gap-6 text-sm">
           {isLoggedIn ? (
             <>
-              <Link href="/blogs">
-                <button className="bg-transparent border px-4 py-2 rounded text-white transition">
-                  Blogs
-                </button>
-              </Link>
-
+              <MenuItem href="/blogs" label="Blogs" icon={BookOpen} />
               {isAdmin && (
-                <Link href="/blogform">
-                  <button className="bg-transparent border px-4 py-2 rounded text-white transition">
-                    Add Blog
-                  </button>
-                </Link>
+                <MenuItem href="/blogform" label="Add Blog" icon={FilePlus} />
               )}
-
-              <button
-                onClick={handleLogout}
-                className="bg-transparent border px-4 py-2 rounded text-white transition hover:bg-red-600"
-              >
-                Logout
-              </button>
+              <MenuItem label="Logout" icon={LogOut} onClick={handleLogout} />
             </>
           ) : (
             <>
-              <Link href="/login">
-                <button className="bg-transparent border px-4 py-2 rounded text-white transition hover:bg-blue-600">
-                  Login
-                </button>
-              </Link>
-              <Link href="/signup">
-                <button className="bg-transparent border px-4 py-2 rounded text-white transition hover:bg-green-600">
-                  Signup
-                </button>
-              </Link>
+              <MenuItem href="/login" label="Login" icon={LogIn} />
+              <MenuItem href="/signup" label="Signup" icon={UserPlus} />
             </>
           )}
         </nav>
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="sm:hidden px-4 pb-4 flex flex-col space-y-2 bg-gray-800">
+        <div className="sm:hidden px-4 pb-4 flex flex-col gap-3 bg-gray-800 text-sm">
           {isLoggedIn ? (
             <>
-              <Link href="/blogs">
-                <button className="w-full bg-transparent border px-4 py-2 rounded text-white transition text-left">
-                  Blogs
-                </button>
-              </Link>
+              <MenuItem href="/blogs" label="Blogs" icon={BookOpen} />
               {isAdmin && (
-                <Link href="/blogform">
-                  <button className="w-full bg-transparent border px-4 py-2 rounded text-white transition text-left">
-                    Add Blog
-                  </button>
-                </Link>
+                <MenuItem href="/blogform" label="Add Blog" icon={FilePlus} />
               )}
-              <button
-                onClick={handleLogout}
-                className="w-full bg-transparent border px-4 py-2 rounded text-white transition text-left"
-              >
-                Logout
-              </button>
+              <MenuItem label="Logout" icon={LogOut} onClick={handleLogout} />
             </>
           ) : (
             <>
-              <Link href="/login">
-                <button className="w-full bg-transparent border px-4 py-2 rounded text-white transition text-left hover:bg-blue-600">
-                  Login
-                </button>
-              </Link>
-              <Link href="/signup">
-                <button className="w-full bg-transparent border px-4 py-2 rounded text-white transition text-left hover:bg-green-600">
-                  Signup
-                </button>
-              </Link>
+              <MenuItem href="/login" label="Login" icon={LogIn} />
+              <MenuItem href="/signup" label="Signup" icon={UserPlus} />
             </>
           )}
         </div>
