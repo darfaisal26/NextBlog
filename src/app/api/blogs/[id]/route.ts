@@ -1,8 +1,11 @@
 import { PrismaClient } from "@/generated/prisma";
-const prisma = new PrismaClient();
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
 import jwt from "jsonwebtoken";
-const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret";
+import { blogSchemaWithoutImage } from "@/lib/validation/formSchema";
+
+const prisma = new PrismaClient();
 
 export async function GET(
   req: Request,
@@ -20,8 +23,6 @@ export async function GET(
         id: parseInt(id),
       },
     });
-
-    console.log("Post fetched:", post);
 
     if (!post) {
       return new Response("Post not found", { status: 404 });
@@ -49,22 +50,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    const userId = decoded.userId;
-
     const post = await prisma.post.findUnique({
       where: { id: Number(id) },
     });
 
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
-    }
-
-    if (post.authorId !== userId) {
-      return NextResponse.json(
-        { error: "Unauthorized to delete this post" },
-        { status: 403 }
-      );
     }
 
     await prisma.post.delete({
@@ -100,8 +91,9 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const token = req.headers.get("authorization")?.split(" ")[1];
 
+    // Extract token
+    const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -114,19 +106,38 @@ export async function PUT(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    const body = await req.json();
-    const { title, content } = body;
+    const formData = await req.formData();
 
-    if (!title || !content) {
+    const title = formData.get("title")?.toString() || "";
+    const content = formData.get("content")?.toString() || "";
+    const image = formData.get("image") as File | null;
+
+    // Validate data
+    const parsed = blogSchemaWithoutImage.safeParse({ title, content });
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Title and content are required" },
+        { error: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
+    let imagePath = post.image;
+    if (image) {
+      const buffer = Buffer.from(await image.arrayBuffer());
+      const uploadsDir = path.join(process.cwd(), "public/uploads");
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const filePath = path.join(uploadsDir, image.name);
+      await fs.writeFile(filePath, buffer);
+      imagePath = `/uploads/${image.name}`;
+    }
+
     const updatedPost = await prisma.post.update({
       where: { id: Number(id) },
-      data: { title, content },
+      data: {
+        title,
+        content,
+        image: imagePath,
+      },
     });
 
     return NextResponse.json(updatedPost, { status: 200 });
@@ -138,6 +149,7 @@ export async function PUT(
         { status: 401 }
       );
     }
+
     return NextResponse.json({ error: "Failed to edit post" }, { status: 500 });
   }
 }

@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
+import { Eye } from "lucide-react";
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const validateForm = () => {
@@ -68,16 +70,23 @@ export default function Login() {
           }
           className="w-full p-3 mb-4 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
         />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, password: e.target.value }))
-          }
-          className="w-full p-3 mb-4 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, password: e.target.value }))
+            }
+            className="w-full p-3 mb-4 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-6 text-blue-500 bottom-8 cursor-pointer"
+          >
+            <Eye />
+          </span>
+        </div>
 
         <button
           type="submit"

@@ -7,6 +7,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { deletePost } from "@/lib/api";
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 interface BlogListClientProps {
   posts: any[];
@@ -22,6 +23,7 @@ export default function BlogListClient({
   const [posts, setPosts] = useState(initialPosts);
 
   const handleDelete = async (id: number) => {
+    // console.log("Deleting post with ID:", id, typeof id);
     if (confirm("Are you sure you want to delete this post?")) {
       try {
         const res = await deletePost(id, token);
@@ -49,45 +51,7 @@ export default function BlogListClient({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* {posts.map((post) => (
-          <div
-            key={post.id}
-            className="backdrop-blur-md bg-white/20 border border-white/40 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 flex flex-col justify-between"
-          >
-            <h2 className="text-2xl font-semibold text-white mb-2 drop-shadow-lg">
-              {post.title}
-            </h2>
-            <p className="text-sm text-white/80 mb-4 flex-1">
-              {post.content.slice(0, 150)}...
-            </p>
-            <ClientDate createdAt={post.createdAt} />
-
-            <Link
-              href={`/blogs/${post.id}`}
-              className="inline-block mt-4 text-blue-400 hover:text-blue-200 font-medium transition-colors"
-            >
-              Read more →
-            </Link>
-
-            {role === "ADMIN" && (
-              <div className="mt-4 flex space-x-2">
-                <Link
-                  href={`/blogs/edit/${post.id}`}
-                  className="text-white bg-transparent border cursor-pointer border-white px-6 py-1 rounded transition-all hover:bg-white/20"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="text-white bg-red-500 cursor-pointer hover:bg-red-600 px-6 py-1 rounded transition-all"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        ))} */}
+      <div className="grid grid-cols-1 relative z-10 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {posts.map((post) => (
           <div
             key={post.id}
@@ -100,6 +64,17 @@ export default function BlogListClient({
             <p className="text-sm text-white/90 mb-4 flex-1">
               {post.content.slice(0, 150)}...
             </p>
+            {post.image ? (
+              <div className="">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  width={200}
+                  height={100}
+                  className="rounded-lg object-cover  mb-4"
+                />
+              </div>
+            ) : null}
 
             <div className="flex justify-between items-center text-sm text-white/70 mt-auto">
               <ClientDate createdAt={post.createdAt} />

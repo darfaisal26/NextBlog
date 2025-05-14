@@ -10,6 +10,7 @@ export const getPostData = async (id: string) => {
 };
 
 export const deletePost = async (id: number, token: string) => {
+  console.log("Deleting post with ID:", id, "number ", typeof id);
   try {
     const response = await axios.delete(`/blogs/${id}`, {
       headers: {

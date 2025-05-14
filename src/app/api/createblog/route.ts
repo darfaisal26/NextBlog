@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import jwt from "jsonwebtoken";
+import fs from "fs/promises";
+import path from "path";
+import { blogSchema } from "@/lib/validation/formSchema";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || "your-jwt-secret";
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.headers.get("authorization")?.split(" ")[1];
+    const tokenHeader = req.headers.get("authorization") || "";
+    const token = tokenHeader.split(" ")[1];
 
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,37 +20,54 @@ export async function POST(req: NextRequest) {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
     const userId = decoded.userId;
 
-    const body = await req.json();
-    const { title, content } = body;
+    const formData = await req.formData();
+    const title = formData.get("title");
+    const content = formData.get("content");
+    const image = formData.get("image");
 
-    if (!title || !content) {
+    // Run Zod validation
+    const parsed = blogSchema.safeParse({ title, content, image });
+
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
       return NextResponse.json(
-        { error: "Title and content are required" },
+        { error: "Validation failed", details: errors },
         { status: 400 }
       );
     }
 
+    // Handle file upload
+    const file = image as File;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploadsDir = path.join(process.cwd(), "public/uploads");
+
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const filePath = path.join(uploadsDir, file.name);
+    await fs.writeFile(filePath, buffer);
+    const imagePath = `/uploads/${file.name}`;
+
+    // Save to DB
     const newPost = await prisma.post.create({
       data: {
-        title,
-        content,
+        title: parsed.data.title,
+        content: parsed.data.content,
         authorId: userId,
-        image: "", 
+        image: imagePath,
       },
     });
 
     return NextResponse.json(newPost, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating post:", error);
+    console.error("Upload error:", error);
+
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 }
       );
     }
-    return NextResponse.json(
-      { error: "Failed to create post" },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -21,7 +21,7 @@ export default function RootLayout({
             layout="fill"
             objectFit="cover"
             quality={100}
-            className="opacity-50"
+            className="opacity-50 object-contain"
           />
         </div>
         {children}

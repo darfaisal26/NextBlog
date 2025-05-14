@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import axios from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
-import { createBlogPost } from "@/lib/api";
+import toast from "react-hot-toast";
+import axios from "@/lib/axios";
 
 const PostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const router = useRouter();
 
@@ -40,6 +42,7 @@ const PostForm = () => {
     setValidationErrors([]);
 
     const formErrors = validateForm();
+
     if (formErrors.length > 0) {
       setValidationErrors(formErrors);
       setLoading(false);
@@ -53,12 +56,21 @@ const PostForm = () => {
         return;
       }
 
-      const response = await createBlogPost(title, content, token);
-      if (response.status === 201) {
-        router.push("/blogs");
-      }
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      if (imageFile) formData.append("image", imageFile);
+
+      await axios.post("/createblog", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Post created successfully!");
+      router.push("/blogs");
     } catch (err) {
-      setError("Error creating post.");
+      setError("Error creating post. catch block");
       console.error(err);
     } finally {
       setLoading(false);
@@ -70,11 +82,11 @@ const PostForm = () => {
       <div className="relative z-10">
         <Header />
       </div>
-      <div className="min-h-screen py-10 px-4">
+      <div className="px-4 py-4">
         <div className="max-w-3xl mx-auto">
           <div className="p-8 rounded-2xl relative z-20 border shadow-xl hover:shadow-lg transition-shadow duration-300">
-            <h1 className="text-3xl font-semibold text-blue-800 mb-6 ">
-              Create a New Post
+            <h1 className="text-3xl  font-semibold relative text-blue-800 mb-6 ">
+              Add New Post
             </h1>
 
             {error && <p className="text-red-600 font-medium mb-4">{error}</p>}
@@ -123,12 +135,30 @@ const PostForm = () => {
                 />
               </div>
 
+              <div>
+                <label
+                  htmlFor="content"
+                  className="block text-lg font-medium text-white mb-1"
+                >
+                  Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageFile(e.target.files[0]);
+                    }
+                  }}
+                  className="block mt-2 border border-gray-300 rounded-lg p-4"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full md:w-auto px-6 cursor-pointer py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300 disabled:opacity-50"
+                className="w-full md:w-auto px-8 cursor-pointer py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300 disabled:opacity-50"
               >
-                {loading ? "Creating..." : "Create Post"}
+                {loading ? "Submitting..." : "Submit"}
               </button>
             </form>
           </div>
