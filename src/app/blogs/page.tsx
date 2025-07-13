@@ -36,11 +36,20 @@ export default async function BlogListPage() {
   }
 
   return (
-    <>
-      <div className="relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-blue-500/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      {/* Header */}
+      <div className="relative z-20">
         <Header />
       </div>
+
+      {/* Main Content */}
       <BlogListClient posts={posts} role={role} token={token} />
-    </>
+    </div>
   );
 }

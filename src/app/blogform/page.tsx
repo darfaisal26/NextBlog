@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import toast from "react-hot-toast";
 import axios from "@/lib/axios";
+import Image from "next/image";
 
 const PostForm = () => {
   const [title, setTitle] = useState("");
@@ -12,7 +13,7 @@ const PostForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const router = useRouter();
 
@@ -148,10 +149,14 @@ const PostForm = () => {
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       setImageFile(e.target.files[0]);
+                      const url = URL.createObjectURL(e.target.files[0]);
+                      console.log(url);
+                      setImagePreview(url);
                     }
                   }}
                   className="block mt-2 border border-gray-300 rounded-lg p-4"
                 />
+                {imagePreview && <img src={imagePreview} alt="Preview" />}
               </div>
               <button
                 type="submit"

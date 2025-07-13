@@ -63,33 +63,63 @@ export default function Header() {
     icon: React.ElementType;
     onClick?: () => void;
   }) => (
-    <div className="flex items-center gap-2 text-white hover:text-blue-400 transition">
-      {Icon && <Icon size={18} />}
+    <div className="group flex items-center gap-3 text-white/90 hover:text-white transition-all duration-300 hover:scale-105 active:scale-95">
+      {Icon && (
+        <Icon
+          size={18}
+          className="transition-all duration-300 group-hover:text-blue-400 group-hover:scale-110"
+        />
+      )}
       {href ? (
-        <Link href={href}>{label}</Link>
+        <Link
+          href={href}
+          className="relative overflow-hidden rounded-lg px-3 py-2 transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm"
+        >
+          <span className="relative z-10">{label}</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300"></div>
+        </Link>
       ) : (
-        <button onClick={onClick} className="text-left">
-          {label}
+        <button
+          onClick={onClick}
+          className="relative overflow-hidden rounded-lg px-3 py-2 text-left transition-all duration-300 hover:bg-white/10 hover:backdrop-blur-sm group"
+        >
+          <span className="relative z-10">{label}</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 to-orange-500/0 group-hover:from-red-500/20 group-hover:to-orange-500/20 transition-all duration-300"></div>
         </button>
       )}
     </div>
   );
 
   return (
-    <header className="bg-gray-900 text-white shadow-md">
-      <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          <Link href="/" className="hover:text-gray-300 transition">
+    <header className="relative bg-gradient-to-r from-gray-900/95 via-slate-900/95 to-gray-900/95 backdrop-blur-xl text-white shadow-2xl border-b border-white/10">
+      {/* Header glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 animate-pulse"></div>
+
+      <div className="relative max-w-screen-xl mx-auto px-4 py-6 flex items-center justify-between">
+        {/* Enhanced logo */}
+        <h1 className="text-3xl font-black">
+          <Link
+            href="/"
+            className="relative bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent hover:from-pink-500 hover:via-purple-500 hover:to-blue-400 transition-all duration-500 hover:scale-105 active:scale-95"
+          >
             Next Blog
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-0 hover:opacity-20 blur-xl rounded-lg transition-all duration-500"></div>
           </Link>
         </h1>
 
-        <button onClick={toggleMenu} className="sm:hidden text-white">
-          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        {/* Enhanced mobile menu button */}
+        <button
+          onClick={toggleMenu}
+          className="sm:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-300 hover:scale-110 active:scale-95"
+        >
+          <div className="relative">
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/0 hover:from-blue-500/20 hover:to-purple-500/20 rounded-lg transition-all duration-300"></div>
+          </div>
         </button>
 
-        {/* Desktop Nav */}
-        <nav className="hidden sm:flex items-center gap-6 text-sm">
+        {/* Enhanced desktop navigation */}
+        <nav className="hidden sm:flex items-center gap-8 text-sm font-medium">
           {isLoggedIn ? (
             <>
               <MenuItem href="/blogs" label="Blogs" icon={BookOpen} />
@@ -107,23 +137,25 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Enhanced mobile menu */}
       {isMenuOpen && (
-        <div className="sm:hidden px-4 pb-4 flex flex-col gap-3 bg-gray-800 text-sm">
-          {isLoggedIn ? (
-            <>
-              <MenuItem href="/blogs" label="Blogs" icon={BookOpen} />
-              {isAdmin && (
-                <MenuItem href="/blogform" label="Add Blog" icon={FilePlus} />
-              )}
-              <MenuItem label="Logout" icon={LogOut} onClick={handleLogout} />
-            </>
-          ) : (
-            <>
-              <MenuItem href="/login" label="Login" icon={LogIn} />
-              <MenuItem href="/signup" label="Signup" icon={UserPlus} />
-            </>
-          )}
+        <div className="sm:hidden">
+          <div className="px-6 pb-6 flex flex-col gap-4 bg-gradient-to-b from-gray-800/95 to-gray-900/95 backdrop-blur-xl text-sm border-t border-white/10">
+            {isLoggedIn ? (
+              <>
+                <MenuItem href="/blogs" label="Blogs" icon={BookOpen} />
+                {isAdmin && (
+                  <MenuItem href="/blogform" label="Add Blog" icon={FilePlus} />
+                )}
+                <MenuItem label="Logout" icon={LogOut} onClick={handleLogout} />
+              </>
+            ) : (
+              <>
+                <MenuItem href="/login" label="Login" icon={LogIn} />
+                <MenuItem href="/signup" label="Signup" icon={UserPlus} />
+              </>
+            )}
+          </div>
         </div>
       )}
     </header>
