@@ -61,6 +61,7 @@ export default function Login() {
         router.push("/blogs");
       }, 1000);
     } catch (error: any) {
+      console.log("Login error:", error);
       const errMsg =
         error?.response?.data?.message || "Login failed. Try again.";
       setMessage(errMsg);

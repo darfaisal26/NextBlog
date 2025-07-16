@@ -42,7 +42,10 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await axios.get("/logout");
+      // const token = localStorage.getItem("token") || Cookies.get("token");
+
+      // await axios.get("/logout");
+      Cookies.remove("token");
       localStorage.clear();
       setIsLoggedIn(false);
       setRole(null);
